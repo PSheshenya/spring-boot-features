@@ -1,0 +1,72 @@
+#---
+##demo-service
+#---
+# gateway для demo сервисов
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: demo-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+    - hosts:
+        - demo.services.org.my
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: demo-dr
+spec:
+  host: demo-service
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http2MaxRequests: 1
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 5m
+      maxEjectionPercent: 100
+      minHealthPercent: 0
+  subsets:
+    - name: v1
+      labels:
+        version: v1.0
+    - name: vMock
+      labels:
+        version: 1-mock
+---
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: demo-vs
+spec:
+  hosts:
+    - demo.services.org.my
+  gateways:
+    - demo-gateway
+  http:
+    - route:
+        - destination:
+            host: demo-service
+            subset: v1
+          weight: 100
+        - destination:
+            host: demo-service
+            subset: vMock
+          weight: 0
+#      retries:
+#        attempts: 2
+#        perTryTimeout: 7s
+#        retryOn: 5xx
+#      timeout: 55.5s
