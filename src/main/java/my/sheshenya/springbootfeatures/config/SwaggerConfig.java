@@ -1,4 +1,4 @@
-package ru.vsk.integration.kkm.config;
+package my.sheshenya.springbootfeatures.config;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -14,6 +14,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Set;
+
 @Configuration
 @EnableSwagger2
 @Import({BeanValidatorPluginsConfiguration.class})
@@ -21,18 +23,20 @@ public class SwaggerConfig {
     @Bean
     public Docket api_10() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("kkm-api-v1")
+                .groupName("demo-api-v1")
                 .select()
 //                .apis(RequestHandlerSelectors.any())
-                .apis(RequestHandlerSelectors.basePackage("ru.vsk.integration.kkm"))
+                .apis(RequestHandlerSelectors.basePackage("my.sheshenya.springbootfeatures"))
 //                .paths(PathSelectors.any())
                 .paths(paths_10())
                 .build()
+                .consumes(Set.of("application/json", "application/xml"))
+                .produces(Set.of("application/json", "application/xml"))
                 .apiInfo(apiEndPointsInfo_10());
     }
     private ApiInfo apiEndPointsInfo_10() {
-        return new ApiInfoBuilder().title("KKM Service Application")
-                .description("KKM Service Application on spring boot v1.0")
+        return new ApiInfoBuilder().title("Demo Service Application")
+                .description("Demo Service Application on spring boot v1.0")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .version("1.0")
@@ -42,26 +46,28 @@ public class SwaggerConfig {
     // Only select apis that matches the given Predicates.
     private Predicate<String> paths_10() {
         // Match all paths except /error
-//        return Predicates.and(
-//                PathSelectors.regex("/.*"),
-//                Predicates.not(PathSelectors.regex("/error.*"))
-//        );
         return Predicates.and(
-                PathSelectors.regex("/v1.*")
+                PathSelectors.regex("/projects.*"),
+                Predicates.not(PathSelectors.regex("/error.*"))
         );
+//        return Predicates.and(
+//                PathSelectors.regex("/v1.*")
+//        );
     }
 
 
     @Bean
     public Docket api_mock() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("kkm-api-mock")
+                .groupName("demo-api-mock")
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("ru.vsk.integration.kkm"))
+                .apis(RequestHandlerSelectors.basePackage("my.sheshenya.springbootfeatures"))
                 .paths(PathSelectors.regex("/mock.*"))
                 .build()
-                .apiInfo(new ApiInfoBuilder().title("KKM Service Application")
-                        .description("KKM Service Application on spring boot vMock")
+                .consumes(Set.of("application/json", "application/xml"))
+                .produces(Set.of("application/json", "application/xml"))
+                .apiInfo(new ApiInfoBuilder().title("Demo Service Application")
+                        .description("Demo Service Application on spring boot vMock")
                         .license("Apache 2.0")
                         .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                         .version("mock")
