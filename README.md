@@ -50,3 +50,12 @@ Running 10s test @ http://localhost:8080/projects/alex/1
 Requests/sec:   2009.83
 Transfer/sec:    539.77KB
 ```
+
+## CI/CD Steps
+CI/CD process generally follows the following scheme:
+Checkout Code
+Run Unit Tests
+Run Sonar
+Dockerize App
+Push dockerized app to Docker Registry
+Deploy the dockerized app on K8s/Istio

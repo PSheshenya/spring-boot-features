@@ -25,6 +25,8 @@
 
 		<gatling.version>3.1.1</gatling.version>
 		<gatling-maven-plugin.version>3.0.1</gatling-maven-plugin.version>
+
+		<sonar.token>pass_real_token</sonar.token>
 	</properties>
 
 	<dependencies>
@@ -148,6 +150,12 @@
 			</plugin>
 
 			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.6.0.1398</version>
+			</plugin>
+
+			<plugin>
 				<groupId>io.gatling</groupId>
 				<artifactId>gatling-maven-plugin</artifactId>
 				<version>${gatling-maven-plugin.version}</version>
@@ -173,5 +181,21 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+				<sonar.projectName>${project.artifactId}</sonar.projectName>
+				<sonar.projectVersion>${project.version}</sonar.projectVersion>
+				<sonar.login>${sonar.token}</sonar.login>
+				<sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>

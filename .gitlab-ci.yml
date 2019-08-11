@@ -1,0 +1,82 @@
+stages:
+  - build
+  - sonar
+  - push
+  - deploy
+  - service
+
+build_snapshots:
+  stage: build
+  image: docker-registry:port/org/maven:3.6.1-jdk11
+  script:
+    - echo "Build and Test with maven..."
+    - mvn package -U -e
+  artifacts:
+    paths:
+    - target
+  tags:
+    - docker
+
+sonar_snapshots:
+  stage: sonar
+  image: docker-registry:port/org/maven:3.6.1-jdk11
+  script:
+    - echo "Sonar with maven..."
+    - mvn sonar:sonar -Psonar -Dsonar.token=$SONAR_TOKEN
+  dependencies:
+    - build_snapshots
+  tags:
+    - docker
+
+docker_push:
+  stage: push
+  script:
+    - export VERSION=$(grep version target/maven-archiver/pom.properties | cut -d= -f2)
+    - export JAR_FILE="spring-boot-features.jar"
+    - echo "Build docker image to Nexus $(cat target/docker/image-name) with VERSION=$VERSION and JAR_FILE=$JAR_FILE"
+    - docker build -t docker-registry:port/org/demo-service:$VERSION --build-arg VERSION=$VERSION --build-arg JAR_FILE=$JAR_FILE .
+    - echo "Push docker image to Nexus"
+    - docker push docker-registry:port/org/demo-service:$VERSION
+  dependencies:
+    - build_snapshots
+  artifacts:
+    paths:
+    - target/maven-archiver/pom.properties
+    expire_in: 7 day
+  tags:
+    - bash
+
+kubenetes_apply:
+  stage: deploy
+  image: docker-registry:port/org/kubectl:latest
+  script:
+    - export VERSION=$(grep version target/maven-archiver/pom.properties | cut -d= -f2)
+    - kubectl set image deployment/demo-v1 demo=docker-registry:port/org/demo:$VERSION --namespace test
+  dependencies:
+    - docker_push
+  tags:
+    - docker
+
+kubenetes_scale_to_zero:
+  stage: service
+  image: docker-registry:port/org/kubectl:latest
+  script:
+    - echo "Scale deployment to zero (OFF)"
+    - kubectl scale deploy demo-v1 --replicas=0  --namespace test
+  dependencies:
+    - kubenetes_apply
+  when: manual
+  tags:
+    - docker
+
+kubenetes_scale_to_one:
+  stage: service
+  image: docker-registry:port/org/kubectl:latest
+  script:
+    - echo "Scale deployment to one (ON)"
+    - kubectl scale deploy demo-v1 --replicas=1  --namespace test
+  dependencies:
+    - kubenetes_apply
+  when: manual
+  tags:
+    - docker
