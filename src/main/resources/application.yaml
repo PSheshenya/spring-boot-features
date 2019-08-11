@@ -1,0 +1,64 @@
+server:
+  port: 8080
+  error:
+    include-stacktrace: ON_TRACE_PARAM
+
+spring:
+  application:
+    name: demo
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=FALSE
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+
+
+
+
+# Actuator
+## Spring Boot Actuator Info Endpoint Customization
+info:
+  # static properties
+  app:
+    name: KKM Commutator Application
+    description: This is KKM Commutator spring boot application
+
+  # build properties from maven
+  build:
+    groupId: @project.groupId@
+    artifact: @project.artifactId@
+    name: @project.name@
+    version: @project.version@
+
+  # environment variables
+  env:
+    java:
+      vendor: ${java.specification.vendor}
+      vm-name: ${java.vm.name}
+      runtime-version: ${java.runtime.version}
+
+# Micrometer
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+        exclude: loggers
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always
+
+# logging
+logging:
+  level:
+    my.sheshenya: DEBUG
+#    org.springframework: DEBUG
+#    org.apache.tomcat.util: WARN
+
