@@ -3,7 +3,7 @@ Sample RnD project that shows how to create microservices with **Spring Boot 2.0
 
 Also this project contains code with **Apache Kafka** and **Spring Data**.
 
-Documentation in Swagger2 API
+Documentation in **Swagger2 API**
 
 Testing with JUnit and some load test with [Gatling](https://gatling.io)
 
@@ -26,6 +26,8 @@ The project consists of the following type of class and files:
 
 ## Workflow
 
+**When you use docker container, you should change the port in urls below**
+
 Basic steps with code:
 
 - open IDE
@@ -37,11 +39,6 @@ Basic steps with code:
   - using **Actuator** open http://localhost:8080/actuator
   - **H2 database** GUI console navigate to http://localhost:8080/h2-console 
   - **Swagger API** open http://localhost:8080/swagger-ui.html
-
-### Branching information:
-* `master` the latest version of the project
-
-
 
 
 ## DataSource
@@ -93,6 +90,18 @@ Requests/sec:   2009.83
 Transfer/sec:    539.77KB
 ```
 
+## Dockerize App 
+Build the image
+`$ docker build -t psheshenya/demo-service:latest .`
+
+
+Also yiu can get image from DockerHub
+`$ docker docker pull psheshenya/demo-service`
+Run the image
+`$ docker run --rm -d -p 80:8080  psheshenya/demo-service:latest`
+
+Now, you can request api through your http client as Postman etc
+
 ## CI/CD Steps
 CI/CD process generally follows the following scheme:
 - Checkout Code
@@ -102,4 +111,8 @@ CI/CD process generally follows the following scheme:
 - Push dockerized app to Docker Registry
 - Deploy the dockerized app on K8s/Istio
 
-## Dockerize App
+PS:
+I'm stuck on the waitlist for the GitHub Actions Beta and automated build Configured just on DockerHub (ref on GitHub project)
+
+### Branching information:
+* `master` the latest version of the project
