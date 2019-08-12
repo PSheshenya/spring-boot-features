@@ -1,16 +1,20 @@
-FROM azul/zulu-openjdk-alpine:11-jre
-#FROM openjdk:11-jre-alpine
+#
+# Build stage
+#
+FROM maven:3.6.0-jdk-11-slim AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package
+
+#
+# Package stage
+#
+FROM openjdk:11-jre-slim
 MAINTAINER Petr Sheshenya <pyotr.sh@gmail.com>
-
-# Add the service itself
-ARG VERSION
-ARG JAR_FILE
-COPY target/${JAR_FILE} /usr/share/service/app.jar
+COPY --from=build /home/app/target/spring-boot-features.jar /usr/share/service/app.jar
+EXPOSE 8080
 WORKDIR /usr/share/service/
-# COPY target/*.jar /usr/share/service/app.jar
 ENTRYPOINT ["/usr/bin/java", "-jar", "/usr/share/service/app.jar"]
-
 
 # label for the image
 LABEL Description="Demo Service" Version="${VERSION}"
-# https://spring.io/blog/2018/11/08/spring-boot-in-a-container

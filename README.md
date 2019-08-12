@@ -1,34 +1,75 @@
-# spring-boot-features
-Sample RnD project that shows how to create microservices with Spring Boot 2.0 containerized by Docker and orchestrate by Kubernetes and Istio. 
+# Spring Boot features
+Sample RnD project that shows how to create microservices with **Spring Boot 2.0** containerized by Docker and orchestrate by Kubernetes and Istio. 
 
-Also this project contains samples with Apache Kafka and Spring Data. 
-As load tests is also shown Gatling
+Also this project contains code with **Apache Kafka** and **Spring Data**.
+
+Documentation in Swagger2 API
+
+Testing with JUnit and some load test with [Gatling](https://gatling.io)
+
+
+## Prerequisites
+
+The project can be run as a Maven project with Java 8 or 11 depends on `java.version` parameter in pom file.
+
+## Project Structure
+
+The project consists of the following type of class and files:
+
+- Controllers
+- Servise
+- Repositories
+- Configs (Swagger, apps)
+- Tests (Unit and Load)
+- .sql and .http files
+- Dockerfile, Kubernetes and Istio files
+
+## Workflow
+
+Basic steps with code:
+
+- open IDE
+- `git clone`
+- compiling the whole project
+  - run `./mvnw clean install` 
+- run main in SpringBootFeaturesApplication
+- checking links 
+  - using **Actuator** open http://localhost:8080/actuator
+  - **H2 database** GUI console navigate to http://localhost:8080/h2-console 
+  - **Swagger API** open http://localhost:8080/swagger-ui.html
+
+### Branching information:
+* `master` the latest version of the project
+
+
 
 
 ## DataSource
-By default, Spring Boot configures the application to connect to an in-memory store with the username sa and an empty password.
+By default, this project configures the application to connect to an in-memory store H2 with the username sa and an empty password.
 H2 database has an embedded GUI console for browsing the contents of a database and running SQL queries.
 we can navigate to http://localhost:port/h2-console 
 
-Spring Boot will automatically pick up the data.sql in src/main/resources and run it against our configured H2 database during application startup. 
+Spring Boot will automatically pick up the data.sql in `src/main/resources` and run it against our configured H2 database during application startup. 
 This is a good way to seed the database for testing or other purposes.
+
 
 ## Swagger
 Use swagger API http://localhost:8080/swagger-ui.html
+
 We can navigate for different versions of our service (Select a spec) also choose needed Response content type
 
 ## Load Tests
 ### Gatling
-When app run, we can start load tests by gatling (see https://gatling.io/docs/current/extensions/maven_plugin/)
+When app run, we can start load tests by **Gatling** (see https://gatling.io/docs/current/extensions/maven_plugin/)
 ```
 sheshenya@mbp-sheshenya: ~/spring-boot-features (master) $ ./mvnw gatling:test
 ```
-As a result we can get report in target/gatling folder  
-By default load tests skiped
+As a result we can get report in `target/gatling` folder  
+By default load tests skiped in pom file
 ### wrk  
-HTTP benchmarking wia wrk tool https://github.com/wg/wrk 
+HTTP benchmarking wia **wrk** tool https://github.com/wg/wrk 
 ```
-sheshenya@mbp-sheshenya: ~/spring-boot-features (master) $ wrk -t 10 -c 1000 -d 10s http://localhost:8080/actuator/info
+~/spring-boot-features (master) $ wrk -t 10 -c 1000 -d 10s http://localhost:8080/actuator/info
 Running 10s test @ http://localhost:8080/actuator/info
   10 threads and 1000 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -38,7 +79,8 @@ Running 10s test @ http://localhost:8080/actuator/info
   Socket errors: connect 0, read 893, write 0, timeout 10
 Requests/sec:   3062.32
 Transfer/sec:      1.47MB
-sheshenya@mbp-sheshenya: ~/spring-boot-features (master) $ wrk -t 10 -c 1000 -d 10s http://localhost:8080/projects/alex/1
+
+~/spring-boot-features (master) $ wrk -t 10 -c 1000 -d 10s http://localhost:8080/projects/alex/1
 Running 10s test @ http://localhost:8080/projects/alex/1
   10 threads and 1000 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
@@ -53,9 +95,11 @@ Transfer/sec:    539.77KB
 
 ## CI/CD Steps
 CI/CD process generally follows the following scheme:
-Checkout Code
-Run Unit Tests
-Run Sonar
-Dockerize App
-Push dockerized app to Docker Registry
-Deploy the dockerized app on K8s/Istio
+- Checkout Code
+- Run Unit Tests
+- Run Sonar
+- Dockerize App
+- Push dockerized app to Docker Registry
+- Deploy the dockerized app on K8s/Istio
+
+## Dockerize App
